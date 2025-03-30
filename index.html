@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ФЕНИКС-1|ТЕРМИНАЛ</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: monospace;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #terminal {
+            height: 90vh;
+            overflow-y: auto;
+        }
+        #input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        #prompt {
+            margin-right: 10px;
+        }
+        #command-input {
+            background: transparent;
+            color: #fff;
+            border: none;
+            border-bottom: 1px solid #fff;
+            font-family: monospace;
+            outline: none;
+            flex-grow: 1;
+            padding: 5px 0;
+        }
+        .output {
+            margin: 5px 0;
+            white-space: pre-wrap;
+        }
+        .success {
+            color: #0f0;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal">
+        <div class="output">ФЕНИКС-1 ТЕРМИНАЛ v3.1.4</div>
+        <div class="output">Для справки введите <span style="color:#0ff">help</span></div>
+        
+        <div id="input-line">
+            <span id="prompt">></span>
+            <input type="text" id="command-input" autofocus>
+        </div>
+    </div>
+
+    <script>
+        const commands = {
+            help: {
+                desc: "Список доступных команд",
+                execute: () => "Доступные команды:\n" +
+                               "login - Авторизация\n" +
+                               "decode [код] - Декодировать ключ\n" +
+                               "clear - Очистить терминал"
+            },
+            login: {
+                desc: "Вход в систему",
+                execute: () => {
+                    const login = prompt("Логин:");
+                    const password = prompt("Пароль:");
+                    if (login === "guest" && password === "RISE") {
+                        return "<span class='success'>Успешная авторизация</span>";
+                    } else {
+                        return "Ошибка: неверные данные";
+                    }
+                }
+            },
+            decode: {
+                desc: "Декодировать ключ",
+                execute: (arg) => {
+                    if (arg === "7049") {
+                        return "<span class='success'>Результат: 0429</span>\n" +
+                               "Переход: phoenix1.ru/stage6?token=0429";
+                    } else {
+                        return "Ошибка: неверный код";
+                    }
+                }
+            },
+            clear: {
+                desc: "Очистить терминал",
+                execute: () => {
+                    document.getElementById("terminal").innerHTML = `
+                        <div id="input-line">
+                            <span id="prompt">></span>
+                            <input type="text" id="command-input" autofocus>
+                        </div>`;
+                    setupInput();
+                    return "";
+                }
+            }
+        };
+
+        function setupInput() {
+            const input = document.getElementById("command-input");
+            input.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    processCommand(input.value);
+                    input.value = "";
+                }
+            });
+        }
+
+        function processCommand(cmd) {
+            const terminal = document.getElementById("terminal");
+            const [command, arg] = cmd.split(" ");
+            
+            // Вывод введённой команды
+            const promptLine = document.getElementById("input-line");
+            promptLine.insertAdjacentHTML("beforebegin", `<div class="output">> ${cmd}</div>`);
+            
+            // Обработка команды
+            if (commands[command]) {
+                const result = commands[command].execute(arg);
+                if (result) {
+                    promptLine.insertAdjacentHTML("beforebegin", `<div class="output">${result}</div>`);
+                }
+            } else {
+                promptLine.insertAdjacentHTML("beforebegin", `<div class="output">Ошибка: неизвестная команда</div>`);
+            }
+            
+            // Прокрутка вниз
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Инициализация
+        setupInput();
+    </script>
+</body>
+</html>
