@@ -108,7 +108,7 @@
                 execute: (arg) => {
                     if (arg === "7049") {
                         showModal();
-                        return "<span class='success'>Код принят. Введите декодированный ключ</span>";
+                        return "<span class='success'>Код принят. Введите декодированный ключ в появившемся окне</span>";
                     } else {
                         return "Ошибка: неверный код";
                     }
@@ -165,22 +165,24 @@
         function checkDecodedKey() {
             const key = document.getElementById("modal-input").value;
             if (key === "0429") {
-                // Создаем и скачиваем файл с четверостишием
-                const poem = 
+                // Создаем и скачиваем файл с четверостишием и ссылкой
+                const content = 
 `Тени сгущаются у стен,
 Феникс готовит свой полёт,
 Последний символ - вот он,
-Код в последних буквах ждёт`;
+Код в последних буквах ждёт
 
-                const blob = new Blob([poem], {type: "text/plain"});
+https://nermixon.github.io/phoenix1final/`;
+                
+                const blob = new Blob([content], {type: "text/plain"});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = "phoenix_poem.txt";
+                a.download = "phoenix_clue.txt";
                 a.click();
                 
                 document.getElementById("modal").style.display = "none";
-                addOutput("> Файл с ключом скачан. Анализируйте последние буквы.");
+                addOutput("> Файл 'phoenix_clue.txt' скачан. Проверьте загрузки.");
             } else {
                 alert("Неверный декодированный ключ");
             }
