@@ -42,6 +42,26 @@
         .success {
             color: #0f0;
         }
+        #modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            border: 1px solid #fff;
+            padding: 20px;
+            z-index: 100;
+            text-align: center;
+        }
+        #modal-input {
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 8px;
+            margin: 10px 0;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -53,6 +73,13 @@
             <span id="prompt">></span>
             <input type="text" id="command-input" autofocus>
         </div>
+    </div>
+
+    <!-- Модальное окно для ввода декодированного ключа -->
+    <div id="modal">
+        <div>ВВЕДИТЕ ДЕКОДИРОВАННЫЙ КЛЮЧ:</div>
+        <input type="text" id="modal-input">
+        <button onclick="checkDecodedKey()">ПОДТВЕРДИТЬ</button>
     </div>
 
     <script>
@@ -80,8 +107,8 @@
                 desc: "Декодировать ключ",
                 execute: (arg) => {
                     if (arg === "7049") {
-                        return "<span class='success'>Результат: 0429</span>\n" +
-                               "Переход: phoenix1.ru/stage6?token=0429";
+                        showModal();
+                        return "<span class='success'>Код принят. Введите декодированный ключ</span>";
                     } else {
                         return "Ошибка: неверный код";
                     }
@@ -115,11 +142,9 @@
             const terminal = document.getElementById("terminal");
             const [command, arg] = cmd.split(" ");
             
-            // Вывод введённой команды
             const promptLine = document.getElementById("input-line");
             promptLine.insertAdjacentHTML("beforebegin", `<div class="output">> ${cmd}</div>`);
             
-            // Обработка команды
             if (commands[command]) {
                 const result = commands[command].execute(arg);
                 if (result) {
@@ -129,7 +154,42 @@
                 promptLine.insertAdjacentHTML("beforebegin", `<div class="output">Ошибка: неизвестная команда</div>`);
             }
             
-            // Прокрутка вниз
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function showModal() {
+            document.getElementById("modal").style.display = "block";
+            document.getElementById("modal-input").focus();
+        }
+
+        function checkDecodedKey() {
+            const key = document.getElementById("modal-input").value;
+            if (key === "0429") {
+                // Создаем и скачиваем файл с четверостишием
+                const poem = 
+`Тени сгущаются у стен,
+Феникс готовит свой полёт,
+Последний символ - вот он,
+Код в последних буквах ждёт`;
+
+                const blob = new Blob([poem], {type: "text/plain"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "phoenix_poem.txt";
+                a.click();
+                
+                document.getElementById("modal").style.display = "none";
+                addOutput("> Файл с ключом скачан. Анализируйте последние буквы.");
+            } else {
+                alert("Неверный декодированный ключ");
+            }
+        }
+
+        function addOutput(text) {
+            const terminal = document.getElementById("terminal");
+            const promptLine = document.getElementById("input-line");
+            promptLine.insertAdjacentHTML("beforebegin", `<div class="output">${text}</div>`);
             terminal.scrollTop = terminal.scrollHeight;
         }
 
